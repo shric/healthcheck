@@ -8,7 +8,12 @@ class PostgreSQLOutput:
         self.config = config
         self.db = psycopg2.connect(self.config['dsn'])
 
-    def get_url_id(self, url):
+    def create_or_get_url_id(self, url):
+        """Get an url_id from the database, add the entry if the url does not exist."""
+
+        # There are many alternative ways to do this compared to a SELECT/INSERT
+        # which could suffer from a race, but the implementations are far less trivial.
+        # See https://stackoverflow.com/questions/34708509/how-to-use-returning-with-on-conflict-in-postgresql
         c = self.db.cursor(cursor_factory=RealDictCursor)
         c.execute("SELECT id FROM urls WHERE url=%s", (url,))
         res = c.fetchone()
@@ -20,7 +25,7 @@ class PostgreSQLOutput:
             return c.fetchone()['id']
 
     def send(self, result):
-        url_id = self.get_url_id(result.url)
+        url_id = self.create_or_get_url_id(result.url)
 
         c = self.db.cursor(cursor_factory=RealDictCursor)
         c.execute("INSERT INTO scrape_results (url_id, scrape_time, status_code, matched, response_time, error) "

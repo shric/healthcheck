@@ -7,7 +7,7 @@ import scraper
 import tests.mock_output
 
 
-class TestMatched(unittest.TestCase):
+class TestScrape(unittest.TestCase):
     def setUp(self):
         self.scraper_config = {
             'scraper': {'frequency': 1, 'run_once': True},
@@ -74,6 +74,15 @@ class TestScrapeResultOK(unittest.TestCase):
 
     def test_repr(self):
         self.assertEqual(repr(self.sr), "2020-05-04 05:50:39: http://foo: 200 False 0.5")
+
+
+class TestScrapeResultError(unittest.TestCase):
+    def setUp(self):
+        self.sr = scraper.ScrapeResult(url="http://foo", scrape_time=1588571439.95631, status_code=None,
+                                       matched=None, response_time=None, error="Error")
+
+    def test_repr(self):
+        self.assertEqual(repr(self.sr), "2020-05-04 05:50:39: http://foo: Error")
 
 
 if __name__ == '__main__':
