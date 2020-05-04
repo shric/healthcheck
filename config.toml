@@ -1,0 +1,34 @@
+[kafka]
+topic = "healthcheck"
+config.bootstrap_servers="host:port"
+config.security_protocol="SSL"
+config.ssl_cafile="ca.pem"
+config.ssl_certfile="service.cert"
+config.ssl_keyfile="service.key"
+consumer.auto_offset_reset="earliest"
+consumer.client_id="storer"
+consumer.group_id="storer"
+
+[postgresql]
+dsn = "postgres://storer:xxxxxx@host:port/healthcheck?sslmode=require"
+
+[store]
+stub=0
+
+[scrape.scraper]
+frequency=5
+
+[scrape.request]
+timeout=10
+
+[scrape."https://www.google.com"]
+request.timeout=1
+
+[scrape."https://ramblings.implicit.net"]
+request.timeout=5
+pattern="functions that.*"
+
+[scrape."https://expired.badssl.com/"]
+request.verify=false
+
+[scrape."https://wrong.host.badssl.com/"]
