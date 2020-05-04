@@ -4,9 +4,8 @@ from datetime import datetime
 
 
 class PostgreSQLOutput:
-    def __init__(self, config):
-        self.config = config
-        self.db = psycopg2.connect(self.config['dsn'])
+    def __init__(self, db):
+        self.db = db
 
     def create_or_get_url_id(self, url):
         """Get an url_id from the database, add the entry if the url does not exist."""

@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import json
 
 import scraper
-import tests.mock_output
+import tests.mocks
 
 
 class TestScrape(unittest.TestCase):
@@ -14,11 +14,12 @@ class TestScrape(unittest.TestCase):
             'request': {'timeout': 10},
             'http://127.0.0.1:81': {'pattern': "foo.*"}
         }
-        self.s = scraper.Scraper(tests.mock_output.MockOutput(), self.scraper_config)
+        self.s = scraper.Scraper(tests.mocks.MockOutput(),
+                                 self.scraper_config)
         pass
 
     @patch('scraper.requests.get')
-    @patch('tests.mock_output.MockOutput.send')
+    @patch('tests.mocks.MockOutput.send')
     def test_matched(self, mock_send, mock_get):
         mock_get.return_value = Mock(ok=True)
         mock_get.return_value.status_code = 201
@@ -38,7 +39,7 @@ class TestScrape(unittest.TestCase):
         self.assertEqual(result.matched, True)
 
     @patch('scraper.requests.get')
-    @patch('tests.mock_output.MockOutput.send')
+    @patch('tests.mocks.MockOutput.send')
     def test_nomatched(self, mock_send, mock_get):
         mock_get.return_value.text = "nomatch"
         self.s.run()
@@ -46,7 +47,7 @@ class TestScrape(unittest.TestCase):
         self.assertEqual(result.matched, False)
 
     @patch('scraper.requests.get')
-    @patch('tests.mock_output.MockOutput.send')
+    @patch('tests.mocks.MockOutput.send')
     def test_error(self, mock_send, mock_get):
         mock_get.return_value.text = "nomatch"
         mock_get.side_effect = Mock(side_effect=Exception('Test'))

@@ -4,12 +4,12 @@ import toml
 import kafka_input
 import postgresql_output
 
+import psycopg2
 
 class Storer:
-    def __init__(self, input, output, config):
+    def __init__(self, input, output):
         self.input = input
         self.output = output
-        self.config = config
 
     def run(self):
         while True:
@@ -21,9 +21,9 @@ def main():
     logging.config.fileConfig('logging.conf')
     config = toml.load('config.toml')
 
+    db = psycopg2.connect(config['postgresql']['dsn'])
     s = Storer(kafka_input.KafkaInput(config['kafka']),
-               postgresql_output.PostgreSQLOutput(config['postgresql']),
-               config['store'])
+               postgresql_output.PostgreSQLOutput(db))
     s.run()
 
 
