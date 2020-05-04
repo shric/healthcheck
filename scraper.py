@@ -27,7 +27,19 @@ def unixtime_to_str(unixtime):
 
 
 class ScrapeResult:
+    """
+    A class to store results from Scraper, provides serialize and deserialize helpers.
+    """
     def __init__(self, url=None, scrape_time=None, status_code=None, matched=None, response_time=None, error=None):
+        """
+
+        :param url: The URL that was scraped.
+        :param scrape_time: The time in unixtime format when the scrape occurred.
+        :param status_code: The http status code of the scrape.
+        :param matched: Whether the http get text matched a given pattern (None of no pattern given)
+        :param response_time: The amount of time it took to make the scrape.
+        :param error: Any request.get error string.
+        """
         self.scrape_time = scrape_time
         self.url = url
         self.status_code = status_code
@@ -37,12 +49,23 @@ class ScrapeResult:
         pass
 
     def deserialize(self, string):
+        """
+        Deserializes a string of a scrape result.
+
+        :param string: A JSON string containing the ScrapeResult attributes.
+        :return: A ScrapeResult deserialized from the string.
+        """
         result = json.loads(string)
         for k in ['url', 'status_code', 'matched', 'response_time', 'error', 'scrape_time']:
             setattr(self, k, result[k])
         return self
 
     def serialize(self):
+        """
+        Serializes a ScrapeResult to a string
+
+        :return: A JSON string
+        """
         return str.encode(json.dumps(self.__dict__))
 
     def __repr__(self):
@@ -56,6 +79,24 @@ class ScrapeResult:
 
 class Scraper:
     def __init__(self, output, config):
+        """
+
+        :param output: An output class which implements a send(msg) function.
+        :param config: A config dict containing 'request' and 'scraper' keys and a list of URLs.
+        e.g.
+        {'scraper': {'frequency': 60},
+         'request': {'timeout': 10},
+
+         # This timeout overrides the above
+         'https://www.google.com': {'request': {'timeout': 5}},
+         'https://news.ycombinator.com: {'pattern': 'Hacker N.*'},
+        }
+
+        frequency: The number of seconds to sleep between scrapes.
+        request: a dict containing any kwargs options passed to requests.get
+        pattern: an optional regex to search for.
+
+        """
         self.output = output
         self.request_options = config.pop('request', None)
         self.scraper_options = config.pop('scraper', None)
